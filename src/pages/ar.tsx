@@ -1,6 +1,14 @@
 import { useEffect } from "react"
 import * as THREE from 'three'
 import { THREEx } from "@ar-js-org/ar.js-threejs"
+import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
+
+
+function loadAnimatedModel(path: string, cb: (data: GLTF) => void) {
+  const loader = new GLTFLoader();
+
+  loader.load(path, cb)
+}
 
 export const ArPage = () => {
   // const html = `
@@ -15,6 +23,7 @@ export const ArPage = () => {
   //     <a-entity camera></a-entity>
   //   </a-scene>
   // `
+  //
 
   useEffect(() => {
     const scene = new THREE.Scene();
@@ -39,7 +48,7 @@ export const ArPage = () => {
 
     arToolkitSource.init(() => {
       onResize();
-    }, ()=>null);
+    }, () => null);
 
     const arToolkitContext = new THREEx.ArToolkitContext({
       cameraParametersUrl: '/camera_para.dat',
@@ -58,10 +67,19 @@ export const ArPage = () => {
       patternUrl: 'https://raw.githubusercontent.com/jeromeetienne/AR.js/master/three.js/examples/marker-training/examples/pattern-files/pattern-hiro.patt'
     });
 
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    markerRoot.add(cube);
+    let mixer: any;
+    const clock = new THREE.Clock();
+    loadAnimatedModel('/lariska_standing.glb', (gltf) => {
+      markerRoot.add(gltf.scene)
+
+      if (gltf.animations && gltf.animations.length > 0) {
+        mixer = new THREE.AnimationMixer(gltf.scene);
+
+        gltf.animations.forEach((clip) => {
+          mixer.clipAction(clip).play();
+        });
+      }
+    })
 
     function onResize() {
       arToolkitSource.onResizeElement();
@@ -76,12 +94,13 @@ export const ArPage = () => {
     function animate() {
       requestAnimationFrame(animate);
 
+      if (mixer) {
+        mixer.update(clock.getDelta());
+      }
+
       if (arToolkitSource.ready) {
         arToolkitContext.update(arToolkitSource.domElement);
       }
-
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
 
       renderer.render(scene, camera);
     }
