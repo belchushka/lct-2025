@@ -34,7 +34,7 @@ export abstract class Character {
       this.model = model;
       if (this.modelLoadedResolve != null) this.modelLoadedResolve();
 
-      this.scene.add(model.scene);
+      //this.scene.add(model.scene);
     });
   }
 
@@ -94,10 +94,13 @@ export abstract class Character {
     })
 
     this.markerController.addEventListener("markerFound" as any, ()=>{
-      if (!resolve) {
-        return
+      if (!resolve) return;
+
+      if (this.model) {
+        this.scene.add(this.model.scene);
       }
-      resolve(null)
+
+      resolve(null);
     })
 
     await visiblePromise

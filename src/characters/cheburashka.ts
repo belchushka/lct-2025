@@ -23,7 +23,7 @@ export class Cheburashka extends Character {
     this.model.scene.rotation.x = -Math.PI;
     this.model.scene.rotation.z = -Math.PI / 2;
 
-    this.model.scene.scale.set(2, 2, 2);
+    this.model.scene.scale.set(10, 10, 10);
 
     const audio = new Audio("/audio/cheburashka_hello.mp3");
     audio.play();

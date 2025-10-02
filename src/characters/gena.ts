@@ -19,7 +19,7 @@ export class Gena extends Character {
   public playVideo(): void {
     const videoPlane = this.createVideoPlane("/salut.mp4", 10, 6);
 
-    // Position the video plane behind Gena
+    //Position the video plane behind Gena
     videoPlane.position.x = 10;
     videoPlane.scale.set(2, 2, 2)
     videoPlane.rotation.y = -Math.PI / 2;

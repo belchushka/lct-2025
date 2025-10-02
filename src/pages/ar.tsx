@@ -211,7 +211,7 @@ export const ArPage = () => {
         setState("completed");
       });
 
-      // Play the video behind Gena
+      //Play the video behind Gena
       genaCharacter.current?.playVideo();
     }
   }
