@@ -26,7 +26,7 @@ function createMarker(patternUrl: string, rootScene: THREE.Scene, ctx: any) {
 export const ArPage = () => {
   const [state, setState] = useState<string>("init");
   const [volkState, setVolkState] = useState<string>("init");
-  const [cheburashkaState, setCheburashkaState] = useState<string>("init");
+  const [, setCheburashkaState] = useState<string>("init");
   const genaCharacter = useRef<Gena | null>(null);
   const volkCharacter = useRef<Volk | null>(null);
   const cheburashkaCharacter = useRef<Cheburashka | null>(null);
@@ -120,7 +120,7 @@ export const ArPage = () => {
       new Cheburashka({
         scene: cheburashkaMarker.scene,
         markerController: cheburashkaMarker.controls,
-        dispatchEvent: (event: string, data: any) => {
+        dispatchEvent: (event: string) => {
           if (event == "helloEnded") {
             setCheburashkaState("showReadyButton");
           }
