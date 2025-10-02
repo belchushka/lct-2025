@@ -38,7 +38,7 @@ export const ArPage = () => {
 
   useEffect(() => {
     const scene = new THREE.Scene();
-    const camera = new THREE.Camera();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     scene.add(camera);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -56,6 +56,7 @@ export const ArPage = () => {
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1;
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
 
     document.getElementById("ar-container")?.appendChild(renderer.domElement);
 
@@ -76,7 +77,7 @@ export const ArPage = () => {
 
     const arToolkitContext = new THREEx.ArToolkitContext({
       cameraParametersUrl: "/camera_para.dat",
-      detectionMode: "mono",
+      detectionMode: "color_and_matrix",
     });
 
     arToolkitContext.init(() => {
@@ -159,6 +160,10 @@ export const ArPage = () => {
       if (arToolkitContext.arController !== null) {
         arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
       }
+
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
     window.addEventListener("resize", onResize);
@@ -221,7 +226,7 @@ export const ArPage = () => {
   }
 
   return (
-    <div className="w-screen h-screen" id="ar-container">
+    <div className="overflow-hidden" id="ar-container">
       {state == 'showReadyButton' && (
         <div className="absolute bottom-8 left-0 right-0 flex justify-center">
           <Button size="lg" onClick={handleReadyClick}>Я готов!</Button>
