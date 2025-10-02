@@ -64,7 +64,7 @@ export class Volk extends Character {
       this.dispatchEvent("helloEnded", null);
     });
 
-    const stop = await this.runAnimation("Armature|Sit_Cross_Legged|baselayer")
+    await this.runAnimation("Armature|Sit_Cross_Legged|baselayer")
     //stop()
   }
 }

@@ -7,6 +7,7 @@ import { Volk } from "@/characters/volk";
 import { Cheburashka } from "@/characters/cheburashka";
 import { EggCatchGame } from "@/components/EggCatchGame";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createMarker(patternUrl: string, rootScene: THREE.Scene, ctx: any) {
   const markerRoot = new THREE.Group();
   rootScene.add(markerRoot);
@@ -101,7 +102,7 @@ export const ArPage = () => {
       new Gena({
         scene: genaMarker.scene,
         markerController: genaMarker.controls,
-        dispatchEvent: (event: string, data: any) => {
+        dispatchEvent: (event: string) => {
           if (event == "helloEnded") {
             setState("showReadyButton");
           }
@@ -110,7 +111,7 @@ export const ArPage = () => {
       new Volk({
         scene: volkMarker.scene,
         markerController: volkMarker.controls,
-        dispatchEvent: (event: string, data: any) => {
+        dispatchEvent: (event: string) => {
           if (event == "helloEnded") {
             setVolkState("showReadyButton");
           }

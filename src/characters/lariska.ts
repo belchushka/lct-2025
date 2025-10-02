@@ -15,7 +15,7 @@ export class Lariska extends Character {
   }
 
   protected async script(): Promise<void> {
-    const stop = await this.runAnimation("Armature|Idle|baselayer")
+    await this.runAnimation("Armature|Idle|baselayer")
 
     const audio = new Audio('/audio/lariska_laugh.mp3')
     audio.play()
