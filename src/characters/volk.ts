@@ -2,6 +2,7 @@ import { Character, type CharacterConstructorParams } from "./base";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 export class Volk extends Character {
+  
   constructor({scene, markerController, dispatchEvent}: CharacterConstructorParams) {
     super({scene, markerController, dispatchEvent})
   }

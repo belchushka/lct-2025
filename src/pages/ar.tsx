@@ -5,6 +5,7 @@ import { Gena } from "@/characters/gena";
 import { Button } from "@/components/ui/button";
 import { Volk } from "@/characters/volk";
 import { Cheburashka } from "@/characters/cheburashka";
+import { Shapoklyak } from "@/characters/shapoklyak";
 import { EggCatchGame } from "@/components/EggCatchGame";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,9 +28,11 @@ export const ArPage = () => {
   const [state, setState] = useState<string>("init");
   const [volkState, setVolkState] = useState<string>("init");
   const [cheburashkaState, setCheburashkaState] = useState<string>("init");
+  const [shapoklyakState, setShapoklyakState] = useState<string>("init");
   const genaCharacter = useRef<Gena | null>(null);
   const volkCharacter = useRef<Volk | null>(null);
   const cheburashkaCharacter = useRef<Cheburashka | null>(null);
+  const shapoklyakCharacter = useRef<Shapoklyak | null>(null);
   const [selectedSong, setSelectedSong] = useState<string | null>(null);
   const singingAudioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -52,8 +55,8 @@ export const ArPage = () => {
 
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1;
-
     renderer.setSize(window.innerWidth, window.innerHeight);
+
     document.getElementById("ar-container")?.appendChild(renderer.domElement);
 
     const arToolkitSource = new THREEx.ArToolkitSource({
@@ -98,6 +101,12 @@ export const ArPage = () => {
       arToolkitContext
     );
 
+    const shapoklyakMarker = createMarker(
+      "/pattern-shapoklyak_marker.patt",
+      scene,
+      arToolkitContext
+    );
+
     const characters = [
       new Gena({
         scene: genaMarker.scene,
@@ -126,11 +135,21 @@ export const ArPage = () => {
           }
         },
       }),
+      new Shapoklyak({
+        scene: shapoklyakMarker.scene,
+        markerController: shapoklyakMarker.controls,
+        dispatchEvent: (event: string) => {
+          if (event == "helloEnded") {
+            setShapoklyakState("showReadyButton");
+          }
+        },
+      }),
     ];
 
     genaCharacter.current = characters[0] as Gena;
     volkCharacter.current = characters[1] as Volk;
     cheburashkaCharacter.current = characters[2] as Cheburashka;
+    shapoklyakCharacter.current = characters[3] as Shapoklyak;
 
     characters.forEach((x) => x.run());
 
@@ -215,6 +234,19 @@ export const ArPage = () => {
       )}
       {volkState == 'playing' && (
         <EggCatchGame onGameEnd={handleGameEnd} />
+      )}
+      {cheburashkaState == 'showReadyButton' && (
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+          <Button size="lg" onClick={() => {
+            cheburashkaCharacter.current?.showRandomBackground();
+            setCheburashkaState("completed");
+          }}>Поменять фон</Button>
+        </div>
+      )}
+      {shapoklyakState == 'showReadyButton' && (
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+          <Button size="lg" onClick={() => setShapoklyakState("completed")}>Готово!</Button>
+        </div>
       )}
       {state == 'singing' && (
         <div className="absolute bottom-8 left-0 right-0 flex justify-center">
