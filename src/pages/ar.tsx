@@ -4,6 +4,7 @@ import { THREEx } from "@ar-js-org/ar.js-threejs";
 import { Gena } from "@/characters/gena";
 import { Button } from "@/components/ui/button";
 import { Volk } from "@/characters/volk";
+import { Cheburashka } from "@/characters/cheburashka";
 import { EggCatchGame } from "@/components/EggCatchGame";
 
 function createMarker(patternUrl: string, rootScene: THREE.Scene, ctx: any) {
@@ -24,8 +25,10 @@ function createMarker(patternUrl: string, rootScene: THREE.Scene, ctx: any) {
 export const ArPage = () => {
   const [state, setState] = useState<string>("init");
   const [volkState, setVolkState] = useState<string>("init");
+  const [cheburashkaState, setCheburashkaState] = useState<string>("init");
   const genaCharacter = useRef<Gena | null>(null);
   const volkCharacter = useRef<Volk | null>(null);
+  const cheburashkaCharacter = useRef<Cheburashka | null>(null);
   const [selectedSong, setSelectedSong] = useState<string | null>(null);
   const singingAudioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -88,11 +91,11 @@ export const ArPage = () => {
       arToolkitContext
     );
 
-    // const lariskaMarker = createMarker(
-    //   'https://raw.githubusercontent.com/jeromeetienne/AR.js/master/three.js/examples/marker-training/examples/pattern-files/pattern-hiro.patt',
-    //   scene,
-    //   arToolkitContext
-    // )
+    const cheburashkaMarker = createMarker(
+      "/pattern-cheburashka.patt",
+      scene,
+      arToolkitContext
+    );
 
     const characters = [
       new Gena({
@@ -113,10 +116,20 @@ export const ArPage = () => {
           }
         },
       }),
+      new Cheburashka({
+        scene: cheburashkaMarker.scene,
+        markerController: cheburashkaMarker.controls,
+        dispatchEvent: (event: string, data: any) => {
+          if (event == "helloEnded") {
+            setCheburashkaState("showReadyButton");
+          }
+        },
+      }),
     ];
 
     genaCharacter.current = characters[0] as Gena;
     volkCharacter.current = characters[1] as Volk;
+    cheburashkaCharacter.current = characters[2] as Cheburashka;
 
     characters.forEach((x) => x.run());
 
