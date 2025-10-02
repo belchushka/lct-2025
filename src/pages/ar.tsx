@@ -19,6 +19,10 @@ function createMarker(patternUrl: string, rootScene: THREE.Scene, ctx: any) {
   const controls = new THREEx.ArMarkerControls(ctx, markerRoot, {
     type: "pattern",
     patternUrl: patternUrl,
+    smooth: true,
+    smoothCount: 3,
+    smoothTolerance: 0.005,
+    smoothThreshold: 2,
   });
 
   return {
@@ -63,6 +67,9 @@ export const ArPage = () => {
 
     document.getElementById("ar-container")?.appendChild(renderer.domElement);
 
+    // Fix orientation for mobile - swap dimensions if portrait
+    const isPortrait = window.innerHeight > window.innerWidth;
+  
     const arToolkitSource = new THREEx.ArToolkitSource({
       sourceType: "webcam",
       sourceWidth: isMobile ? 1280 : 1920,
@@ -81,6 +88,13 @@ export const ArPage = () => {
     const arToolkitContext = new THREEx.ArToolkitContext({
       cameraParametersUrl: "/camera_para.dat",
       detectionMode: "color_and_matrix",
+      matrixCodeType: '3x3',
+      patternRatio: 0.5,
+      labelingMode: 'black_region',
+      maxDetectionRate: 60,
+      canvasWidth: isPortrait ? 480 : 640,
+      canvasHeight: isPortrait ? 640 : 480,
+      imageSmoothingEnabled: true,
     });
 
     arToolkitContext.init(() => {
