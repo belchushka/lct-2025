@@ -83,7 +83,7 @@ export const ArPage = () => {
     );
 
     const arToolkitContext = new THREEx.ArToolkitContext({
-      cameraParametersUrl: THREEx.ArToolkitContext.baseURL + '../data/data/camera_para.dat',
+      cameraParametersUrl: "/camera_para.dat",
       detectionMode: "color_and_matrix",
       matrixCodeType: '3x3',
       patternRatio: 0.5,
