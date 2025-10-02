@@ -1,30 +1,22 @@
 import { useEffect } from "react"
 import * as THREE from 'three'
 import { THREEx } from "@ar-js-org/ar.js-threejs"
-import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { Gena } from "@/characters/gena"
+import { Lariska } from "@/characters/lariska";
 
+function createMarkerRoot(patternUrl: string, rootScene: THREE.Scene) {
+  const markerRoot = new THREE.Group();
+  rootScene.add(markerRoot);
 
-function loadAnimatedModel(path: string, cb: (data: GLTF) => void) {
-  const loader = new GLTFLoader();
+  new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+    type: 'pattern',
+    patternUrl: patternUrl
+  });
 
-  loader.load(path, cb)
+  return markerRoot
 }
 
 export const ArPage = () => {
-  // const html = `
-  //   <a-scene embedded arjs>
-  //     <a-marker preset="hiro">
-  //       <a-entity
-  //         position="0 0 0"
-  //         scale="1 1 1"
-  //         gltf-model="/lariska_standing.glb"
-  //       ></a-entity>
-  //     </a-marker>
-  //     <a-entity camera></a-entity>
-  //   </a-scene>
-  // `
-  //
-
   useEffect(() => {
     const scene = new THREE.Scene();
     const camera = new THREE.Camera();
@@ -59,27 +51,26 @@ export const ArPage = () => {
       camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
     });
 
-    const markerRoot = new THREE.Group();
-    scene.add(markerRoot);
+    const genaMarkerRoot = createMarkerRoot(
+      'https://raw.githubusercontent.com/jeromeetienne/AR.js/master/three.js/examples/marker-training/examples/pattern-files/pattern-hiro.patt',
+      scene
+    )
 
-    new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
-      type: 'pattern',
-      patternUrl: 'https://raw.githubusercontent.com/jeromeetienne/AR.js/master/three.js/examples/marker-training/examples/pattern-files/pattern-hiro.patt'
-    });
+    const lariskaMarkerRoot = createMarkerRoot(
+      'https://raw.githubusercontent.com/jeromeetienne/AR.js/master/three.js/examples/marker-training/examples/pattern-files/pattern-hiro.patt',
+      scene
+    )
 
-    let mixer: any;
-    const clock = new THREE.Clock();
-    loadAnimatedModel('/lariska_standing.glb', (gltf) => {
-      markerRoot.add(gltf.scene)
+    const characters = [
+      new Lariska({
+        scene: lariskaMarkerRoot
+      }),
+      new Gena({
+        scene: genaMarkerRoot
+      })
+    ]
 
-      if (gltf.animations && gltf.animations.length > 0) {
-        mixer = new THREE.AnimationMixer(gltf.scene);
-
-        gltf.animations.forEach((clip) => {
-          mixer.clipAction(clip).play();
-        });
-      }
-    })
+    characters.forEach(x=>x.run())
 
     function onResize() {
       arToolkitSource.onResizeElement();
@@ -94,10 +85,6 @@ export const ArPage = () => {
     function animate() {
       requestAnimationFrame(animate);
 
-      if (mixer) {
-        mixer.update(clock.getDelta());
-      }
-
       if (arToolkitSource.ready) {
         arToolkitContext.update(arToolkitSource.domElement);
       }
@@ -107,7 +94,6 @@ export const ArPage = () => {
 
     animate();
 
-    // Cleanup
     return () => {
       window.removeEventListener('resize', onResize);
       document.getElementById('ar-container')?.removeChild(renderer.domElement);
