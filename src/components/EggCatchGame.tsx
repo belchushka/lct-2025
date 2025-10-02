@@ -18,7 +18,6 @@ export const EggCatchGame = ({ onGameEnd }: EggCatchGameProps) => {
   const [gameTime, setGameTime] = useState(10); // 30 seconds game
   const containerRef = useRef<HTMLDivElement>(null);
   const eggIdCounter = useRef(0);
-  const touchStartX = useRef<number | null>(null);
 
   // Handle touch move for basket
   const handleTouchMove = (e: TouchEvent) => {
