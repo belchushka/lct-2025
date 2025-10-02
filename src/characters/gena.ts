@@ -8,9 +8,10 @@ export class Gena extends Character {
   protected getFilePath(): string {
     return "/gena.glb";
   }
-  public playSinging() {
+  public playSinging(): HTMLAudioElement {
     const audio = new Audio("/audio/gena_singing.mp3");
     audio.play();
+    return audio;
   }
 
   protected async script(): Promise<void> {

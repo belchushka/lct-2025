@@ -22,6 +22,8 @@ function createMarker(patternUrl: string, rootScene: THREE.Scene, ctx: any) {
 export const ArPage = () => {
   const [state, setState] = useState<string>("init");
   const genaCharacter = useRef<Gena | null>(null);
+  const [selectedSong, setSelectedSong] = useState<string | null>(null);
+  const singingAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const scene = new THREE.Scene();
@@ -88,7 +90,7 @@ export const ArPage = () => {
         markerController: genaMarker.controls,
         dispatchEvent: (event: string, data: any) => {
           if (event == "helloEnded") {
-            setState("genaSelectButtons");
+            setState("showReadyButton");
           }
         },
       }),
@@ -129,16 +131,62 @@ export const ArPage = () => {
     };
   }, []);
 
+  const handleReadyClick = () => {
+    const audio = genaCharacter.current?.playSinging();
+    if (audio) {
+      singingAudioRef.current = audio;
+    }
+    setState("singing");
+  }
+
+  const handleSongSelect = (song: string) => {
+    setSelectedSong(song);
+
+    // Only stop the singing audio if correct answer
+    if (song === "Голубой вагон") {
+      if (singingAudioRef.current) {
+        singingAudioRef.current.pause();
+        singingAudioRef.current = null;
+      }
+
+      const lariskaAudio = new Audio("/audio/lariska_laugh.mp3");
+      lariskaAudio.play();
+    }
+  }
+
   return (
     <div className="w-screen h-screen" id="ar-container">
-      {state == "genaSelectButtons" && (
-        <div>
-          <Button size="lg" onClick={() => {genaCharacter.current?.playSinging()}}>
-            Хочу!
-          </Button>
-          <Button size="lg" onClick={() => {}}>
-            Не хочу :(
-          </Button>
+      {state == 'showReadyButton' && (
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+          <Button size="lg" onClick={handleReadyClick}>Я готов!</Button>
+        </div>
+      )}
+      {state == 'singing' && (
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+          <div className="flex flex-col gap-4 items-center bg-white/90 p-6 rounded-lg">
+            <p className="text-lg font-semibold text-center">Угадай, что за песню я играю?</p>
+            <Button
+              size="lg"
+              onClick={() => handleSongSelect("Ромашка-ромашка")}
+              className={selectedSong === "Ромашка-ромашка" ? "bg-red-500 hover:bg-red-600" : ""}
+            >
+              Ромашка-ромашка
+            </Button>
+            <Button
+              size="lg"
+              onClick={() => handleSongSelect("Голубой вагон")}
+              className={selectedSong === "Голубой вагон" ? "bg-green-500 hover:bg-green-600" : ""}
+            >
+              Голубой вагон
+            </Button>
+            <Button
+              size="lg"
+              onClick={() => handleSongSelect("Пусть бегут неуклюже")}
+              className={selectedSong === "Пусть бегут неуклюже" ? "bg-red-500 hover:bg-red-600" : ""}
+            >
+              Пусть бегут неуклюже
+            </Button>
+          </div>
         </div>
       )}
     </div>
