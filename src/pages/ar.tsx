@@ -180,7 +180,6 @@ export const ArPage = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-
     window.addEventListener("resize", onResize);
 
     function animate() {
