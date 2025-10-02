@@ -16,6 +16,12 @@ function createMarker(patternUrl: string, rootScene: THREE.Scene, ctx: any) {
   const controls = new THREEx.ArMarkerControls(ctx, markerRoot, {
     type: "pattern",
     patternUrl: patternUrl,
+    size: 0.2,
+    changeMatrixMode: "modelViewMatrix",
+    smooth: true,
+    smoothCount: 3,
+    smoothTolerance: 0.005,
+    smoothThreshold: 2,
   });
 
   return {
@@ -76,8 +82,15 @@ export const ArPage = () => {
     );
 
     const arToolkitContext = new THREEx.ArToolkitContext({
-      cameraParametersUrl: "/camera_para.dat",
+      cameraParametersUrl: THREEx.ArToolkitContext.baseURL + '../data/data/camera_para.dat',
       detectionMode: "color_and_matrix",
+      matrixCodeType: '3x3',
+      patternRatio: 0.5,
+      labelingMode: 'black_region',
+      maxDetectionRate: 60,
+      canvasWidth: 640,
+      canvasHeight: 480,
+      imageSmoothingEnabled: true,
     });
 
     arToolkitContext.init(() => {
