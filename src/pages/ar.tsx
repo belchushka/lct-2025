@@ -8,6 +8,9 @@ import { Cheburashka } from "@/characters/cheburashka";
 import { Shapoklyak } from "@/characters/shapoklyak";
 import { EggCatchGame } from "@/components/EggCatchGame";
 
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createMarker(patternUrl: string, rootScene: THREE.Scene, ctx: any) {
   const markerRoot = new THREE.Group();
@@ -69,14 +72,14 @@ export const ArPage = () => {
   
     const arToolkitSource = new THREEx.ArToolkitSource({
       sourceType: "webcam",
-      sourceWidth: window.innerWidth,
-      sourceHeight: window.innerHeight,
+      sourceWidth: isMobile ? 1280 : 1920,
+      sourceHeight: isMobile ? 720 : 1080,
       displayWidth: window.innerWidth,
       displayHeight: window.innerHeight,
     });
 
     arToolkitSource.init(
-      () => {
+      async () => {
         onResize();
       },
       () => null
