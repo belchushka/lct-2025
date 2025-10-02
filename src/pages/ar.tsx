@@ -3,6 +3,8 @@ import * as THREE from "three";
 import { THREEx } from "@ar-js-org/ar.js-threejs";
 import { Gena } from "@/characters/gena";
 import { Button } from "@/components/ui/button";
+import { Volk } from "@/characters/volk";
+import { EggCatchGame } from "@/components/EggCatchGame";
 
 function createMarker(patternUrl: string, rootScene: THREE.Scene, ctx: any) {
   const markerRoot = new THREE.Group();
@@ -21,7 +23,9 @@ function createMarker(patternUrl: string, rootScene: THREE.Scene, ctx: any) {
 
 export const ArPage = () => {
   const [state, setState] = useState<string>("init");
+  const [volkState, setVolkState] = useState<string>("init");
   const genaCharacter = useRef<Gena | null>(null);
+  const volkCharacter = useRef<Volk | null>(null);
   const [selectedSong, setSelectedSong] = useState<string | null>(null);
   const singingAudioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -73,7 +77,13 @@ export const ArPage = () => {
     });
 
     const genaMarker = createMarker(
-      "https://raw.githubusercontent.com/jeromeetienne/AR.js/master/three.js/examples/marker-training/examples/pattern-files/pattern-hiro.patt",
+      "/pattern-gena_marker.patt",
+      scene,
+      arToolkitContext
+    );
+
+    const volkMarker = createMarker(
+      "/pattern-volk_marker.patt",
       scene,
       arToolkitContext
     );
@@ -94,12 +104,19 @@ export const ArPage = () => {
           }
         },
       }),
-      // new Gena({
-      //   scene: genaMarker.scene
-      // })
+      new Volk({
+        scene: volkMarker.scene,
+        markerController: volkMarker.controls,
+        dispatchEvent: (event: string, data: any) => {
+          if (event == "helloEnded") {
+            setVolkState("showReadyButton");
+          }
+        },
+      }),
     ];
 
-    genaCharacter.current = characters[0];
+    genaCharacter.current = characters[0] as Gena;
+    volkCharacter.current = characters[1] as Volk;
 
     characters.forEach((x) => x.run());
 
@@ -149,9 +166,25 @@ export const ArPage = () => {
         singingAudioRef.current = null;
       }
 
-      const lariskaAudio = new Audio("/audio/lariska_laugh.mp3");
-      lariskaAudio.play();
+      const genaGoodbye = new Audio("/audio/gena_goodbye.mp3");
+      genaGoodbye.play();
+
+      genaGoodbye.addEventListener("ended", () => {
+        setState("completed");
+      });
+
+      // Play the video behind Gena
+      genaCharacter.current?.playVideo();
     }
+  }
+
+  const handleGameEnd = async (score: number) => {
+    setVolkState("gameEnded");
+    console.log("Game ended with score:", score);
+
+    // Show robot and play audio sequence
+    await volkCharacter.current?.showRobotWithAudio();
+    setVolkState("completed");
   }
 
   return (
@@ -160,6 +193,14 @@ export const ArPage = () => {
         <div className="absolute bottom-8 left-0 right-0 flex justify-center">
           <Button size="lg" onClick={handleReadyClick}>Я готов!</Button>
         </div>
+      )}
+      {volkState == 'showReadyButton' && (
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+          <Button size="lg" onClick={() => setVolkState("playing")}>Сыграем!</Button>
+        </div>
+      )}
+      {volkState == 'playing' && (
+        <EggCatchGame onGameEnd={handleGameEnd} />
       )}
       {state == 'singing' && (
         <div className="absolute bottom-8 left-0 right-0 flex justify-center">

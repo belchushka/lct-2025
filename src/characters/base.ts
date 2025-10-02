@@ -104,4 +104,27 @@ export abstract class Character {
 
     await this.script();
   }
+
+  public createVideoPlane(videoSrc: string, width: number = 10, height: number = 6): THREE.Mesh {
+    const video = document.createElement('video');
+    video.src = videoSrc;
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.play();
+
+    const videoTexture = new THREE.VideoTexture(video);
+    videoTexture.minFilter = THREE.LinearFilter;
+    videoTexture.magFilter = THREE.LinearFilter;
+
+    const planeGeometry = new THREE.PlaneGeometry(width, height);
+    const planeMaterial = new THREE.MeshBasicMaterial({
+      map: videoTexture,
+      side: THREE.DoubleSide
+    });
+
+    const videoPlane = new THREE.Mesh(planeGeometry, planeMaterial);
+
+    return videoPlane;
+  }
 }
