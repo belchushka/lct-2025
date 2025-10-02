@@ -1,15 +1,36 @@
 import { Character, type CharacterConstructorParams } from "./base";
 
 export class Gena extends Character {
-  constructor({scene}: CharacterConstructorParams) {
-    super({scene})
+  constructor({ scene, dispatchEvent, markerController }: CharacterConstructorParams) {
+    super({ scene, dispatchEvent, markerController });
   }
 
   protected getFilePath(): string {
-      return "/gena.glb"
+    return "/gena.glb";
+  }
+  public playSinging() {
+    const audio = new Audio("/audio/gena_singing.mp3");
+    audio.play();
   }
 
   protected async script(): Promise<void> {
-    console.log(this.model?.userData)
+    console.log(this.model?.userData);
+
+    if (this.model == null) {
+      return;
+    }
+
+    this.model.scene.rotation.y = -Math.PI / 2;
+    this.model.scene.rotation.x = -Math.PI;
+    this.model.scene.rotation.z = -Math.PI / 2;
+
+    this.model.scene.scale.set(5, 5, 5);
+
+    const audio = new Audio("/audio/gena_hello.mp3");
+    audio.play();
+
+    audio.addEventListener("ended", () => {
+      this.dispatchEvent("helloEnded", null);
+    });
   }
 }
