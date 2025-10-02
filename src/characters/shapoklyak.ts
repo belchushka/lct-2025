@@ -6,6 +6,8 @@ export class Shapoklyak extends Character {
   private lariskaModel: GLTF | null = null;
   private lariskaMixer: THREE.AnimationMixer | null = null;
   private lariskaClock: THREE.Clock = new THREE.Clock();
+  private lariskaMovementActive: boolean = false;
+  private lariskaStartTime: number = 0;
 
   constructor({ scene, dispatchEvent, markerController }: CharacterConstructorParams) {
     super({ scene, dispatchEvent, markerController });
@@ -51,8 +53,49 @@ export class Shapoklyak extends Character {
       if (this.lariskaMixer) {
         this.lariskaMixer.update(this.lariskaClock.getDelta());
       }
+
+      // Handle movement animation
+      if (this.lariskaMovementActive && this.lariskaModel) {
+        const elapsed = (Date.now() - this.lariskaStartTime) / 1000;
+
+        if (elapsed < 5) {
+          // Run in a circle for 5 seconds
+          const radius = 5;
+          const speed = 1; // rotations per second
+          const angle = elapsed * speed * Math.PI * 2;
+
+          this.lariskaModel.scene.position.x = Math.cos(angle) * radius;
+          this.lariskaModel.scene.position.z = 8.5 + Math.sin(angle) * radius;
+
+          // Rotate to face movement direction
+          this.lariskaModel.scene.rotation.z = -Math.PI / 2 - angle;
+        } else {
+          // Run away and disappear
+          const runAwayDuration = 1; // 1 second to run away
+          const runAwayProgress = (elapsed - 5) / runAwayDuration;
+
+          if (runAwayProgress < 1) {
+            // Move away from center
+            this.lariskaModel.scene.position.z = 2.5 + runAwayProgress * 20;
+            this.lariskaModel.scene.position.y = 2 - runAwayProgress * 3; // move down slightly
+          } else {
+            // Remove from scene
+            this.scene.remove(this.lariskaModel.scene);
+            this.lariskaMovementActive = false;
+
+            // Play goodbye audio
+            const goodbyeAudio = new Audio("/audio/shap_goodbye.mp3");
+            goodbyeAudio.play();
+          }
+        }
+      }
     };
     animate();
+  }
+
+  public startLariskaMovement(): void {
+    this.lariskaMovementActive = true;
+    this.lariskaStartTime = Date.now();
   }
 
   protected async script(): Promise<void> {
@@ -72,6 +115,7 @@ export class Shapoklyak extends Character {
     audio.play();
 
     audio.addEventListener("ended", () => {
+      this.startLariskaMovement();
       this.dispatchEvent("helloEnded", null);
     });
   }
