@@ -13,4 +13,4 @@ COPY . .
 
 RUN ["pnpm", "run", "build"]
 
-ENTRYPOINT ["pnpm", "run", "preview"]
+ENTRYPOINT ["pnpm", "run", "preview", "--host", "0.0.0.0"]
