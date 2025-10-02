@@ -129,7 +129,7 @@ export const ArPage = () => {
       new Cheburashka({
         scene: cheburashkaMarker.scene,
         markerController: cheburashkaMarker.controls,
-        dispatchEvent: (event: string, data: any) => {
+        dispatchEvent: (event: string) => {
           if (event == "helloEnded") {
             setCheburashkaState("showReadyButton");
           }
